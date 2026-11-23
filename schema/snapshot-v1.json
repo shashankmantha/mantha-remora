@@ -1,0 +1,301 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "Confidence": {
+      "description": "How a fact's value was arrived at.",
+      "enum": [
+        "observed",
+        "derived",
+        "assumed"
+      ],
+      "title": "Confidence",
+      "type": "string"
+    },
+    "OSFacts": {
+      "additionalProperties": false,
+      "description": "The `os` section: the distribution, from os-release.",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/StrFact"
+        },
+        "id_like": {
+          "$ref": "#/$defs/StrListFact"
+        },
+        "name": {
+          "$ref": "#/$defs/StrFact"
+        },
+        "pretty_name": {
+          "$ref": "#/$defs/StrFact"
+        },
+        "version_id": {
+          "$ref": "#/$defs/OptionalStrFact"
+        },
+        "version_codename": {
+          "$ref": "#/$defs/OptionalStrFact"
+        },
+        "family": {
+          "$ref": "#/$defs/StrFact"
+        },
+        "fields": {
+          "$ref": "#/$defs/StrMapFact",
+          "description": "Every key in the file, as parsed."
+        }
+      },
+      "required": [
+        "id",
+        "id_like",
+        "name",
+        "pretty_name",
+        "version_id",
+        "version_codename",
+        "family",
+        "fields"
+      ],
+      "title": "OSFacts",
+      "type": "object"
+    },
+    "OptionalStrFact": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "source": {
+          "$ref": "#/$defs/Source"
+        },
+        "collected_at": {
+          "format": "date-time",
+          "title": "Collected At",
+          "type": "string"
+        },
+        "confidence": {
+          "$ref": "#/$defs/Confidence"
+        }
+      },
+      "required": [
+        "value",
+        "source",
+        "collected_at",
+        "confidence"
+      ],
+      "title": "OptionalStrFact",
+      "type": "object"
+    },
+    "ProbeOutcome": {
+      "additionalProperties": false,
+      "description": "Whether a probe produced its section. \"Not checked\" is never a pass.",
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/ProbeStatus"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Why the probe could not check.",
+          "title": "Reason"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "ProbeOutcome",
+      "type": "object"
+    },
+    "ProbeStatus": {
+      "enum": [
+        "ok",
+        "not_checked"
+      ],
+      "title": "ProbeStatus",
+      "type": "string"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "description": "Where on the target a fact came from.",
+      "properties": {
+        "kind": {
+          "enum": [
+            "file",
+            "command"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "location": {
+          "description": "A file path, or the command line that was run.",
+          "title": "Location",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "location"
+      ],
+      "title": "Source",
+      "type": "object"
+    },
+    "StrFact": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "title": "Value",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/Source"
+        },
+        "collected_at": {
+          "format": "date-time",
+          "title": "Collected At",
+          "type": "string"
+        },
+        "confidence": {
+          "$ref": "#/$defs/Confidence"
+        }
+      },
+      "required": [
+        "value",
+        "source",
+        "collected_at",
+        "confidence"
+      ],
+      "title": "StrFact",
+      "type": "object"
+    },
+    "StrListFact": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Value",
+          "type": "array"
+        },
+        "source": {
+          "$ref": "#/$defs/Source"
+        },
+        "collected_at": {
+          "format": "date-time",
+          "title": "Collected At",
+          "type": "string"
+        },
+        "confidence": {
+          "$ref": "#/$defs/Confidence"
+        }
+      },
+      "required": [
+        "value",
+        "source",
+        "collected_at",
+        "confidence"
+      ],
+      "title": "StrListFact",
+      "type": "object"
+    },
+    "StrMapFact": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Value",
+          "type": "object"
+        },
+        "source": {
+          "$ref": "#/$defs/Source"
+        },
+        "collected_at": {
+          "format": "date-time",
+          "title": "Collected At",
+          "type": "string"
+        },
+        "confidence": {
+          "$ref": "#/$defs/Confidence"
+        }
+      },
+      "required": [
+        "value",
+        "source",
+        "collected_at",
+        "confidence"
+      ],
+      "title": "StrMapFact",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/shashankmantha/mantha-remora/schema/snapshot-v1.json",
+  "additionalProperties": false,
+  "description": "Everything one scan learned about one target.",
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "remora_version": {
+      "title": "Remora Version",
+      "type": "string"
+    },
+    "target": {
+      "description": "`local` or `ssh://user@host:port`.",
+      "title": "Target",
+      "type": "string"
+    },
+    "started_at": {
+      "format": "date-time",
+      "title": "Started At",
+      "type": "string"
+    },
+    "finished_at": {
+      "format": "date-time",
+      "title": "Finished At",
+      "type": "string"
+    },
+    "probes": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ProbeOutcome"
+      },
+      "description": "Every probe that ran, keyed by section name, and whether it checked.",
+      "title": "Probes",
+      "type": "object"
+    },
+    "os": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/OSFacts"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "remora_version",
+    "target",
+    "started_at",
+    "finished_at",
+    "probes"
+  ],
+  "title": "mantha-remora snapshot",
+  "type": "object"
+}

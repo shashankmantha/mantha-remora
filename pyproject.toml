@@ -11,6 +11,7 @@ dependencies = [
     "typer>=0.15",
     "rich>=13.7",
     "paramiko>=3.5",
+    "pydantic>=2.11",
 ]
 keywords = ["security", "linux", "hardening", "audit", "virtual-machine", "misconfiguration"]
 classifiers = [
@@ -40,6 +41,8 @@ dev = [
     "ruff>=0.8",
     "mypy>=1.13",
     "types-paramiko>=3.5",
+    "jsonschema>=4.23",
+    "types-jsonschema>=4.23",
 ]
 
 [build-system]
@@ -80,3 +83,8 @@ select = [
 strict = true
 python_version = "3.12"
 files = ["src", "tests"]
+plugins = ["pydantic.mypy"]
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true

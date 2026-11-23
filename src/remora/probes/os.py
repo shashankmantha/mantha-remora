@@ -15,7 +15,17 @@ from __future__ import annotations
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass
+from datetime import datetime
 
+from remora.snapshot import (
+    Confidence,
+    OptionalStrFact,
+    OSFacts,
+    Source,
+    StrFact,
+    StrListFact,
+    StrMapFact,
+)
 from remora.transport import Transport
 
 # Checked in this order, as os-release(5) says: /etc first, then the vendor copy.
@@ -121,3 +131,50 @@ def probe_os(transport: Transport) -> OSInfo | None:
         fields = parse_os_release(data.decode("utf-8", errors="replace"))
         return os_info_from_fields(fields, source=path)
     return None
+
+
+def os_facts(info: OSInfo, collected_at: datetime) -> OSFacts:
+    """Turn an OSInfo into the snapshot's `os` section, with provenance on every fact.
+
+    A value os-release(5) supplied a default for is ASSUMED, not OBSERVED, so a rule
+    can tell "the file says ubuntu" from "the file said nothing, so linux".
+    """
+    source = Source(kind="file", location=info.source)
+    at = collected_at
+    present = info.fields
+
+    def read_or_default(key: str) -> Confidence:
+        return Confidence.OBSERVED if key in present else Confidence.ASSUMED
+
+    if present.get("PRETTY_NAME"):
+        pretty = Confidence.OBSERVED
+    elif "NAME" in present:
+        pretty = Confidence.DERIVED
+    else:
+        pretty = Confidence.ASSUMED
+
+    observed = Confidence.OBSERVED
+    return OSFacts(
+        id=StrFact(value=info.id, confidence=read_or_default("ID"), source=source, collected_at=at),
+        id_like=StrListFact(
+            value=info.id_like, confidence=observed, source=source, collected_at=at
+        ),
+        name=StrFact(
+            value=info.name, confidence=read_or_default("NAME"), source=source, collected_at=at
+        ),
+        pretty_name=StrFact(
+            value=info.pretty_name, confidence=pretty, source=source, collected_at=at
+        ),
+        version_id=OptionalStrFact(
+            value=info.version_id, confidence=observed, source=source, collected_at=at
+        ),
+        version_codename=OptionalStrFact(
+            value=info.version_codename, confidence=observed, source=source, collected_at=at
+        ),
+        family=StrFact(
+            value=info.family, confidence=Confidence.DERIVED, source=source, collected_at=at
+        ),
+        fields=StrMapFact(
+            value=dict(info.fields), confidence=observed, source=source, collected_at=at
+        ),
+    )
