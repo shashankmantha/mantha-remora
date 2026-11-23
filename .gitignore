@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Environments
+.venv/
+
+# Tool caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Scan output: snapshots and reports can contain hostnames, users and keys
+*.snapshot.json
+reports/
+
+# Lab VM disks and secrets
+lab/**/*.qcow2
+lab/**/*.img
+lab/**/id_*
+!lab/**/id_*.pub
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
