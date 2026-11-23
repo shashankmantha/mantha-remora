@@ -10,6 +10,7 @@ requires-python = ">=3.12"
 dependencies = [
     "typer>=0.15",
     "rich>=13.7",
+    "paramiko>=3.5",
 ]
 keywords = ["security", "linux", "hardening", "audit", "virtual-machine", "misconfiguration"]
 classifiers = [
@@ -38,6 +39,7 @@ dev = [
     "pytest>=8.3",
     "ruff>=0.8",
     "mypy>=1.13",
+    "types-paramiko>=3.5",
 ]
 
 [build-system]
@@ -69,7 +71,10 @@ select = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S101"]  # assert is how pytest works
+"tests/**" = [
+    "S101",  # assert is how pytest works
+    "S108",  # tests name fake /tmp paths that are never created
+]
 
 [tool.mypy]
 strict = true
